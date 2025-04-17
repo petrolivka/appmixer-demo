@@ -4,81 +4,113 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import "@/lib/appmixer/appmixer.css";
 
-let appmixer = null;
-
 export default function Home() {
-  const [isBrowser, setIsBrowser] = useState(false);
-  //const [appmixer, setAppmixer] = useState(null);
-
-  const ensureToken = async () => {
-    if (!appmixer) {
-      return;
-    }
-
-    const auth = await appmixer.api.authenticateUser(
-      process.env.NEXT_PUBLIC_VIRTUAL_USER_NAME,
-      process.env.NEXT_PUBLIC_VIRTUAL_USER_TOKEN
-    );
-
-    appmixer.set("accessToken", auth.token);
-  };
+  const [appmixer, setAppmixer] = useState(null);
+  const [widgets, setWidgets] = useState({
+    integrations: null,
+    wizard: null,
+  });
 
   useEffect(() => {
-    setIsBrowser(true);
-
     if (typeof window !== "undefined") {
-      import("@/lib/appmixer/appmixer.es.js").then(
-        ({ Appmixer, Integrations, Wizard }) => {
-          appmixer = new Appmixer({
+      (async () => {
+        try {
+          const { Appmixer, Integrations, Wizard } = await import(
+            "@/lib/appmixer/appmixer.es.js"
+          );
+
+          // Create a local instance
+          const appmixerInstance = new Appmixer({
             baseUrl: "https://api.pumped-jackass-32081.appmixer.cloud",
           });
 
-          ensureToken();
+          // First authenticate before registering UI components
+          try {
+            const auth = await appmixerInstance.api.authenticateUser(
+              process.env.NEXT_PUBLIC_VIRTUAL_USER_NAME,
+              process.env.NEXT_PUBLIC_VIRTUAL_USER_TOKEN
+            );
+            appmixerInstance.set("accessToken", auth.token);
+            console.log("Authentication successful");
+          } catch (error) {
+            console.error("Authentication error:", error);
+            return; // Don't proceed if authentication fails
+          }
 
-          appmixer.ui("Integrations", Integrations);
-          appmixer.ui("Wizard", Wizard);
+          // Register UI components AFTER authentication
+          appmixerInstance.ui("Integrations", Integrations);
+          appmixerInstance.ui("Wizard", Wizard);
 
-          const integrations = appmixer.ui.Integrations({
-            el: "#integrations",
-            options: {
-              showHeader: true,
-            },
-          });
-          const wizard = appmixer.ui.Wizard();
-          wizard.on("flow:start-after", () => integrations.reload());
-          wizard.on("flow:remove-after", () => {
-            integrations.reload();
-            wizard.close();
-          });
+          // Set state with the instance
+          setAppmixer(appmixerInstance);
 
-          integrations.on("integration:create", (templateId) => {
-            wizard.close();
-            wizard.set("flowId", templateId);
-            wizard.open();
-          });
+          // Create UI elements after short delay to ensure DOM is ready
+          setTimeout(() => {
+            try {
+              const integrations = appmixerInstance.ui.Integrations({
+                el: "#integrations",
+                options: {
+                  showHeader: true,
+                },
+              });
 
-          integrations.on("integration:edit", (integrationId) => {
-            wizard.close();
-            wizard.set("flowId", integrationId);
-            wizard.open();
-          });
+              const wizard = appmixerInstance.ui.Wizard();
 
-          integrations.open();
+              // Wire up event handlers
+              wizard.on("flow:start-after", () => integrations.reload());
+              wizard.on("flow:remove-after", () => {
+                integrations.reload();
+                wizard.close();
+              });
+
+              integrations.on("integration:create", (templateId) => {
+                wizard.close();
+                wizard.set("flowId", templateId);
+                wizard.open();
+              });
+
+              integrations.on("integration:edit", (integrationId) => {
+                wizard.close();
+                wizard.set("flowId", integrationId);
+                wizard.open();
+              });
+
+              // Set widgets state
+              setWidgets({
+                integrations,
+                wizard,
+              });
+
+              // Open the integrations panel
+              integrations.open();
+            } catch (err) {
+              console.error("Error initializing UI components:", err);
+            }
+          }, 100);
+        } catch (err) {
+          console.error("Error loading Appmixer:", err);
         }
-      );
+      })();
     }
 
     return () => {
-      //
+      if (widgets.integrations) {
+        widgets.integrations.close();
+      }
+      if (widgets.wizard) {
+        widgets.wizard.close();
+      }
     };
   }, []);
 
   const handleOnTestIntegrationClick = () => {
-    appmixer.api.sendAppEvent("test-event", {
-      first: "John",
-      last: "Doe",
-      hotLead: true,
-    });
+    if (appmixer) {
+      appmixer.api.sendAppEvent("test-event", {
+        first: "Petr",
+        last: "Olivka",
+        hotLead: true,
+      });
+    }
   };
 
   return (
@@ -100,6 +132,7 @@ export default function Home() {
           <button
             className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md"
             onClick={handleOnTestIntegrationClick}
+            disabled={!appmixer}
           >
             Test Integration
           </button>
