@@ -1,87 +1,120 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import "@/lib/appmixer/appmixer.css";
+
+let appmixer = null;
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isBrowser, setIsBrowser] = useState(false);
+  //const [appmixer, setAppmixer] = useState(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const ensureToken = async () => {
+    if (!appmixer) {
+      return;
+    }
+
+    const auth = await appmixer.api.authenticateUser(
+      process.env.NEXT_PUBLIC_VIRTUAL_USER_NAME,
+      process.env.NEXT_PUBLIC_VIRTUAL_USER_TOKEN
+    );
+
+    appmixer.set("accessToken", auth.token);
+  };
+
+  useEffect(() => {
+    setIsBrowser(true);
+
+    if (typeof window !== "undefined") {
+      import("@/lib/appmixer/appmixer.es.js").then(
+        ({ Appmixer, Integrations, Wizard }) => {
+          appmixer = new Appmixer({
+            baseUrl: "https://api.pumped-jackass-32081.appmixer.cloud",
+          });
+
+          ensureToken();
+
+          appmixer.ui("Integrations", Integrations);
+          appmixer.ui("Wizard", Wizard);
+
+          const integrations = appmixer.ui.Integrations({
+            el: "#integrations",
+            options: {
+              showHeader: true,
+            },
+          });
+          const wizard = appmixer.ui.Wizard();
+          wizard.on("flow:start-after", () => integrations.reload());
+          wizard.on("flow:remove-after", () => {
+            integrations.reload();
+            wizard.close();
+          });
+
+          integrations.on("integration:create", (templateId) => {
+            wizard.close();
+            wizard.set("flowId", templateId);
+            wizard.open();
+          });
+
+          integrations.on("integration:edit", (integrationId) => {
+            wizard.close();
+            wizard.set("flowId", integrationId);
+            wizard.open();
+          });
+
+          integrations.open();
+        }
+      );
+    }
+
+    return () => {
+      //
+    };
+  }, []);
+
+  const handleOnTestIntegrationClick = () => {
+    appmixer.api.sendAppEvent("test-event", {
+      first: "John",
+      last: "Doe",
+      hotLead: true,
+    });
+  };
+
+  return (
+    <div className="h-screen">
+      <main className="grid grid-cols-12 gap-4 h-full">
+        <div className="col-span-3">
+          <h1 className="text-2xl font-bold">My Awesome SaaS</h1>
+          <nav className="mt-4">
+            <h2 className="text-lg font-bold">Menu</h2>
+            <ul className="mt-2">
+              <li>
+                <a href="/">Home</a>
+              </li>
+              <li>
+                <a href="/">Home</a>
+              </li>
+            </ul>
+          </nav>
+          <button
+            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md"
+            onClick={handleOnTestIntegrationClick}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            Test Integration
+          </button>
+        </div>
+        <div className="col-span-9">
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+            quos.
+          </p>
+          <div className="h-full">
+            <div id="integrations" className="relative w-full h-full"></div>
+          </div>
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
           href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
