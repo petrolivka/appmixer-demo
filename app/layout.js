@@ -1,6 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import "@/lib/appmixer/appmixer.css";
+import { AppmixerProvider } from "@/providers/appmixer-provider";
+import Link from "next/link";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -20,9 +22,33 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased p-4`}
       >
-        {children}
+        <div className="h-screen">
+          <main className="grid grid-cols-12 gap-4 h-full">
+            <div className="col-span-3">
+              <h1 className="text-2xl font-bold">My Awesome SaaS</h1>
+              <nav className="mt-4">
+                <ul className="mt-2">
+                  <li>
+                    <Link href="/">Home</Link>
+                  </li>
+                  <li>
+                    <Link href="/integrations">Integrations</Link>
+                  </li>
+                  <li>
+                    <Link href="/automations">Automations</Link>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+            <div className="col-span-9">
+              <div className="h-full">
+                <AppmixerProvider>{children}</AppmixerProvider>
+              </div>
+            </div>
+          </main>
+        </div>
       </body>
     </html>
   );
