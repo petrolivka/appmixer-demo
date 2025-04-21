@@ -19,9 +19,8 @@ export function AppmixerProvider({ children }) {
       (async () => {
         try {
           setIsLoading(true);
-          const { Appmixer, Integrations, Wizard, FlowManager } = await import(
-            "@/lib/appmixer/appmixer.es.js"
-          );
+          const { Appmixer, Integrations, Wizard, FlowManager, Designer } =
+            await import("@/lib/appmixer/appmixer.es.js");
 
           // Create a local instance
           const appmixerInstance = new Appmixer({
@@ -47,7 +46,7 @@ export function AppmixerProvider({ children }) {
           appmixerInstance.ui("Integrations", Integrations);
           appmixerInstance.ui("Wizard", Wizard);
           appmixerInstance.ui("FlowManager", FlowManager);
-
+          appmixerInstance.ui("Designer", Designer);
           // Set state with the instance
           setAppmixer(appmixerInstance);
           setIsLoading(false);
@@ -111,6 +110,11 @@ export function AppmixerProvider({ children }) {
     }
   };
 
+  const createDesignerWidget = (el, options = {}) => {
+    if (!appmixer) return null;
+    return appmixer.ui.Designer({ el, ...options });
+  };
+
   return (
     <AppmixerContext.Provider
       value={{
@@ -120,6 +124,7 @@ export function AppmixerProvider({ children }) {
         createIntegrationsWidget,
         createWizardWidget,
         createFlowManagerWidget,
+        createDesignerWidget,
         sendAppEvent,
       }}
     >

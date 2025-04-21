@@ -25,9 +25,14 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased p-4`}
       >
         <div className="h-screen">
+          <header className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold">My Awesome SaaS</h1>
+            <div className="flex items-center gap-2">
+              {/* <button>Logout</button> */}
+            </div>
+          </header>
           <main className="grid grid-cols-12 gap-4 h-full">
-            <div className="col-span-3">
-              <h1 className="text-2xl font-bold">My Awesome SaaS</h1>
+            <div className="col-span-2">
               <nav className="mt-4">
                 <ul className="mt-2">
                   <li>
@@ -42,7 +47,7 @@ export default function RootLayout({ children }) {
                 </ul>
               </nav>
             </div>
-            <div className="col-span-9">
+            <div className="col-span-10">
               <div className="h-full">
                 <AppmixerProvider>{children}</AppmixerProvider>
               </div>
