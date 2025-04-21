@@ -1,6 +1,6 @@
-# AppMixer SaaS Platform
+# AppMixer Demo
 
-A Next.js application that leverages AppMixer's integration tools to create a SaaS platform for building, managing, and automating integrations between different services.
+A Next.js application that leverages AppMixer's integration platform to create a SaaS platform for building, managing, and automating integrations between different services.
 
 ## Features
 
