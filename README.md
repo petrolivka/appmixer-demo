@@ -7,6 +7,8 @@ A Next.js application that leverages AppMixer's integration platform to create a
 - **Integrations Management**: Create and manage integrations between various services
 - **Automation Builder**: Visual designer for creating automated workflows
 - **Flow Manager**: Manage your automation flows easily
+- **AI-Powered Chat**: Movie recommendation chatbot with markdown rendering support
+- **Email Recommendations**: Send movie recommendations directly to email
 
 ## Prerequisites
 
@@ -53,6 +55,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
   - `page.js`: Home page
   - `integrations/`: Integrations management
   - `automations/`: Automation flows management and design
+  - `components/`: Reusable UI components
+    - `Chat.js`: AI-powered movie recommendation chat component
 - `providers/`: React context providers
   - `appmixer-provider.js`: Provides AppMixer instance and widgets to the application
 - `lib/`: External libraries and utilities (contains AppMixer SDK)
@@ -63,6 +67,15 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 2. Create integrations through the `/integrations` page
 3. Build and manage automation flows through the `/automations` page
 4. Each flow can be edited using the visual designer at `/automations/[flowId]`
+5. Interact with the movie recommendation chatbot on the home page
+6. Send movie recommendations to your email with one click
+
+## Chat Component Features
+
+- Markdown rendering for AI responses
+- Email recommendations with a single click
+- Real-time communication with AI recommendation agent
+- Clean, responsive UI with message history
 
 ## Troubleshooting
 
