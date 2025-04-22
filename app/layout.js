@@ -28,9 +28,7 @@ export default function RootLayout({ children }) {
         <div className="h-screen">
           <header className="flex items-center justify-between">
             <h1 className="text-2xl font-bold">My AppMixer Demo</h1>
-            <div className="flex items-center gap-2">
-              {/* <button>Logout</button> */}
-            </div>
+            <div className="flex items-center gap-2"></div>
           </header>
           <main className="grid grid-cols-12 gap-4 h-full">
             <div className="col-span-2">
