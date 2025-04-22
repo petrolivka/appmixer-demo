@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Markdown from "react-markdown";
 
 const WEBHOOK_URL =
   "https://api.pumped-jackass-32081.appmixer.cloud/flows/a41c8f2a-9c24-4d4a-96ee-acd6a1347823/components/8488bf35-9d88-492e-8c0a-b8914c0bfa6c";
@@ -92,12 +93,21 @@ export default function Chat() {
     }
   };
 
-  return (
-    <div className="flex flex-col w-full max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="p-4 bg-blue-600 text-white">
-        <h2 className="text-xl font-semibold">Movie Recommendation Chatbot</h2>
-      </div>
+  // Function to render message content based on sender type
+  const renderMessageContent = (message) => {
+    if (message.sender === "ai") {
+      return (
+        <div className="markdown-content">
+          <Markdown>{message.text}</Markdown>
+        </div>
+      );
+    } else {
+      return <p>{message.text}</p>;
+    }
+  };
 
+  return (
+    <div className="flex flex-col w-full overflow-hidden">
       <div className="flex-1 p-4 h-96 overflow-y-auto">
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 p-4">
@@ -121,7 +131,7 @@ export default function Chat() {
                       : "bg-gray-100 text-gray-800 rounded-bl-none"
                   }`}
                 >
-                  <p className="text-sm">{msg.text}</p>
+                  {renderMessageContent(msg)}
                   <p className="text-xs opacity-70 mt-1">
                     {msg.timestamp.toLocaleTimeString([], {
                       hour: "2-digit",
@@ -137,9 +147,9 @@ export default function Chat() {
       </div>
 
       <div className="border-t p-4">
-        <div className="flex items-center">
+        <div className="flex items-end gap-2">
           <textarea
-            className="flex-1 border rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             rows="2"
             placeholder="Type your message..."
             value={input}
@@ -148,7 +158,7 @@ export default function Chat() {
             disabled={loading}
           />
           <button
-            className={`bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-r-lg ${
+            className={`bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg ${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
             onClick={sendMessage}
