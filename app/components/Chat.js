@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Markdown from "react-markdown";
-
+import { useAppmixer } from "@/providers/appmixer-provider";
 const WEBHOOK_URL =
   "https://api.pumped-jackass-32081.appmixer.cloud/flows/a41c8f2a-9c24-4d4a-96ee-acd6a1347823/components/8488bf35-9d88-492e-8c0a-b8914c0bfa6c";
 
@@ -27,6 +27,7 @@ export default function Chat() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const { sendAppEvent } = useAppmixer();
 
   // Auto-scroll to the bottom when messages change
   useEffect(() => {
@@ -106,6 +107,13 @@ export default function Chat() {
     }
   };
 
+  const handleSendRecommendations = () => {
+    sendAppEvent("send-recommendations", {
+      content: messages[messages.length - 1].text,
+    });
+    alert("Recommendations sent");
+  };
+
   return (
     <div className="flex flex-col w-full overflow-hidden">
       <div className="flex-1 p-4 h-96 overflow-y-auto">
@@ -137,6 +145,14 @@ export default function Chat() {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
+                    {msg.sender === "ai" && (
+                      <button
+                        className="text-xs opacity-70 mt-1 ml-2 cursor-pointer"
+                        onClick={handleSendRecommendations}
+                      >
+                        Send recommendations to e-mail
+                      </button>
+                    )}
                   </p>
                 </div>
               </div>
