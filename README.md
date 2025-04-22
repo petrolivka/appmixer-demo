@@ -1,6 +1,6 @@
 # AppMixer Demo
 
-A Next.js application that leverages AppMixer's integration platform to create a SaaS platform for building, managing, and automating integrations between different services.
+An AppMixer's integration platform demo to showcase basic features. Demo consist of movie recommendation service. Main component uses chat with AI where you can prompt for movies recommendation. AI will suggest movie and could tap on some facts about the moview using tools. 
 
 ## Features
 
@@ -21,7 +21,7 @@ A Next.js application that leverages AppMixer's integration platform to create a
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd my-appmixer-saas
+cd appmixer-demo
 ```
 
 2. Install dependencies:
@@ -82,4 +82,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - If you see "Cannot read properties of null (reading 'append')" error, it's likely a DOM mounting issue. Try refreshing the page or checking the designer container size.
 - For authentication issues, verify your AppMixer credentials in the `.env` file.
 
+## Limitations
+- This demo uses one virtual user that is set using env properties. 
 
