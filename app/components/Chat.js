@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import { useState, useRef, useEffect } from "react";
 import Markdown from "react-markdown";
@@ -16,8 +16,9 @@ const fetcher = async (url, message) => {
   });
 
   if (!response.ok) {
-
-    throw new Error("Failed to fetch response from AI agent: " + response.statusText);
+    throw new Error(
+      "Failed to fetch response from AI agent: " + response.statusText
+    );
   }
 
   return response.json();
